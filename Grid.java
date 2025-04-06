@@ -87,7 +87,7 @@ public class Grid extends GridBase {
     // Handle the command where the rows, columns, and width can be adjusted
     // Omit the equal sign and include the value of the variable
     public String processCommand(String command) {
-        String result = "";
+        String result = "Unhandled";
         return result;
     }
 
