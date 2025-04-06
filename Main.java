@@ -14,6 +14,7 @@ import java.util.*;
  * class will handle certain commands that the Grid does not: help and load
  * file.
  */
+/* This is a test comment */
 public class Main extends ExcelBase {
 
     public static void main(String args[]) {
