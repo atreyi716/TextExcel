@@ -87,10 +87,70 @@ public class Grid extends GridBase {
     // Handle the command where the rows, columns, and width can be adjusted
     // Omit the equal sign and include the value of the variable
     public String processCommand(String command) {
+        String[] tokens = command.split(" ");
         String result = "Unhandled";
+        if (tokens[0].equalsIgnoreCase("print")) {
+            result = printGrid();
+        }
+        else if (isGridSettingCommand(tokens[0])) {
+            result = processGridSettingCommand(tokens);
+        }   
         return result;
     }
-
+    
+    private boolean isGridSettingCommand(String input) {
+        if (input.equalsIgnoreCase("rows") 
+        || input.equalsIgnoreCase("cols") 
+        || input.equalsIgnoreCase("width")) 
+            return true;
+        return false;
+    }
+    private String processGridSettingCommand(String[] tokens) {
+        String result = "";
+        if (tokens.length == 3) {
+            if (tokens[1].equals("=")) {
+                int value = Integer.parseInt(tokens[2]);
+                updateGridSettings(tokens[0], value);
+                result = tokens[2];
+            }
+        } else if (tokens.length == 1) {
+            int value = readGridSettings(tokens[0]);
+            result = String.valueOf(value);
+        } else {
+            result = "Invalid";
+        }
+        return result;
+    }
+    private int readGridSettings(String setting) {
+        int value = -1;
+        switch (setting) {
+            case "rows":
+                value = rowCount;
+                break;
+            case "cols":
+                value = colCount;
+                break;
+            case "width":
+                value = cellWidth;
+                break;
+        }
+        return value;
+    }
+    private void updateGridSettings(String setting, int value) {
+        switch (setting) {
+            case "rows":
+                rowCount = value;
+                createMatrix();
+                break;
+            case "cols":
+                colCount = value;
+                createMatrix();
+                break;
+            case "width":
+                cellWidth = value;
+                break;
+        } 
+    }
     // Create the GRID
     // Top border: has spaces and letters (use function for ASCII values)
     // Calculate the amount of total spaces
@@ -137,7 +197,7 @@ public class Grid extends GridBase {
             result += String.format("%3d |", i+1);
             for (int j = 0; j < colCount; j++) {
                 if (matrix[i][j] != null) {
-                    String cellData = String.format("%"+cellWidth+"s", matrix[i][j].toString());
+                    String cellData = String.format("%" + cellWidth + "s", matrix[i][j].toString());
                     if (cellWidth < cellData.length()) {
                         result += cellData.substring(0, cellWidth);
                     }
