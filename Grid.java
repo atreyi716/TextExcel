@@ -94,17 +94,23 @@ public class Grid extends GridBase {
         }
         else if (isGridSettingCommand(tokens[0])) {
             result = processGridSettingCommand(tokens);
-        }   
+        }
+        else if (isCell(tokens[0])) {
+            result = processCellCommand(tokens);
+        } 
         return result;
     }
-    
+    // Determine what a cell location's components are
+
+    // Check if a valid command is inputted
     private boolean isGridSettingCommand(String input) {
         if (input.equalsIgnoreCase("rows") 
         || input.equalsIgnoreCase("cols") 
-        || input.equalsIgnoreCase("width")) 
+        || input.equalsIgnoreCase("width"))
             return true;
         return false;
     }
+    // Handling the situation with amount of tokens
     private String processGridSettingCommand(String[] tokens) {
         String result = "";
         if (tokens.length == 3) {
@@ -121,6 +127,7 @@ public class Grid extends GridBase {
         }
         return result;
     }
+    // Setters depending on input
     private int readGridSettings(String setting) {
         int value = -1;
         switch (setting) {
@@ -136,6 +143,9 @@ public class Grid extends GridBase {
         }
         return value;
     }
+    // Value returns a double
+    // Display returns a cell's contents (String.valueOf())
+    // Expr takes in parentheses
     private void updateGridSettings(String setting, int value) {
         switch (setting) {
             case "rows":
@@ -151,12 +161,65 @@ public class Grid extends GridBase {
                 break;
         } 
     }
+    private boolean isCell(String input) {
+        if (input.length() == 2) {
+            for (int i = 0; i < input.length(); i++) {
+                if (Character.isDigit(input.charAt(0))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    private String processCellCommand(String[] tokens) {
+        getCellFromToken(tokens[0]);
+        if (tokens[2].startsWith(" ")) {
+            TextCell text = new TextCell();
+        }
+        String expression = "";
+        if (tokens[1].equals("=")) {
+            int value = Integer.parseInt(tokens[2]);
+            expression = tokens[2];
+        }
+        return "";
+    } 
+    private Cell getCellFromToken(String input) {
+        int col = input.toLowerCase().charAt(0) - 'a';
+        int row = Integer.parseInt(input.substring(1)) - 1;
+        return matrix[row][col];
+    }
+    private int readCell(String setting) {
+        switch (setting) {
+            case "expr":
+            break;
+            case "value":
+            break;
+            case "display":
+            break;
+        }
+        return 0;
+    }
+    private void updateCellExpression() {
+        // Concatenate quotes to cell
+        // Loop through remaining tokens
+    }
+    private static String concatTokens(String[] tokens, int begin, int end) {
+        String result = "";
+
+        for (int i = begin; i <= end; i++) {
+            result += (tokens[i]);
+            if (i < end) {
+                result += " ";
+            }
+        }
+        return result.toString();
+    }
     // Create the GRID
     // Top border: has spaces and letters (use function for ASCII values)
     // Calculate the amount of total spaces
     // Calculate the amount of spaces to the left
     // If the width is odd, there should be one less left space
-    public String printGrid () {
+    public String printGrid() {
         String result = "";
         result += "    |";
         for (int j = 1; j <= colCount; j++) {
@@ -194,7 +257,7 @@ public class Grid extends GridBase {
         
         // Print the sub-grid with row numbers
         for (int i = 0; i < rowCount; i++) {
-            result += String.format("%3d |", i+1);
+            result += String.format("%3d |", i + 1);
             for (int j = 0; j < colCount; j++) {
                 if (matrix[i][j] != null) {
                     String cellData = String.format("%" + cellWidth + "s", matrix[i][j].toString());
