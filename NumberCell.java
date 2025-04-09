@@ -18,7 +18,6 @@ public class NumberCell extends Cell {
    * This returns the string to be presented in the grid.
    */
   public String toString() {
-      // TODO: You will need to CHANGE this in later checkpoints.
       // Leverage this method when fulfilling the command, "display [cell]"
       return getValue() + "";
   }
@@ -27,7 +26,6 @@ public class NumberCell extends Cell {
    * This will return the number for this cell.
    */
   public double getValue() {
-      // TODO: You will need to CHANGE this in later checkpoints.
       // Leverage this method when fulfilling the command, "value [cell]"
       return 0.0;
   }

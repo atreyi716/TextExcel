@@ -13,7 +13,6 @@
  *   A properly implemented class can have as few as ~10 lines of code.
  */
 public class DateCell extends Cell {
-    // TODO: Annotate the website(s) you used to get help.
 }
 
 
