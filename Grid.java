@@ -98,9 +98,11 @@ public class Grid extends GridBase {
         } else if (isExprCommand(tokens[0])) {
             result = processExprCommand(tokens);
         } else if (tokens[0].equalsIgnoreCase("display")) {
-
+            result = processDisplayCommand(tokens);
         } else if (tokens[0].equalsIgnoreCase("value")) {
-
+            result = processValueCommand(tokens);
+        } else if (tokens[0].equalsIgnoreCase("clear")) {
+            createMatrix();
         } else {
             result = readCell(rowCount, colCount);
         } 
@@ -181,9 +183,8 @@ public class Grid extends GridBase {
         int[] cellIndices = getCellIndices(tokens[0]);
         col = cellIndices[0];
         row = cellIndices[1];
-        if (tokens[1].equals("=")) {
+        if (tokens.length >= 3 && tokens[1].equals("=")) {
             updateCell(tokens, row, col);
-            result = "Updated";
         } else {
             result = readCell(row, col);
         }
@@ -201,26 +202,25 @@ public class Grid extends GridBase {
         return matrix[row][col].getExpression();
     }
     private void updateCell(String[] tokens, int row, int col) {
+        if (tokens.length < 3) {
+            return;
+        }
         if (tokens[2].startsWith("\"")) {
             updateTextCellExpression(tokens, row, col);
         } else {
             updateNumberCellExpression(tokens, row, col);
         }
     }
-    private void updateTextCellExpression(String[] tokens, int row, int col) {
-        // Concatnate the remaining tokens.
-        String stringExpression = concatTokens(tokens, 2, tokens.length - 1);
+    private void updateTextCellExpression(String[] tokens, int row, int col) {        
         TextCell text = new TextCell();
-        text.setExpression(stringExpression);
+        String expression = concatTokens(tokens, 2, tokens.length - 1);
+        text.setExpression(expression);
         matrix[row][col] = text;
-        NumberCell number = new NumberCell();
-        number.setExpression(stringExpression);
-        matrix[row][col] = number;
-        // Concatenate quotes to cell
-        // Loop through remaining tokens
     }
     private void updateNumberCellExpression(String[] tokens, int row, int col) {
-        matrix[row][col].setExpression(tokens[2]);
+        NumberCell number = new NumberCell();
+        number.setExpression(tokens[2]);
+        matrix[row][col] = number;
     }
     private String processExprCommand(String[] tokens) {
         int row, col;
@@ -241,7 +241,7 @@ public class Grid extends GridBase {
         int[] cellIndices = getCellIndices(tokens[1]);
         col = cellIndices[0];
         row = cellIndices[1];
-        result = readCell(row, col);
+        result = matrix[row][col].toString();
         return result;
     }
     public String processValueCommand(String[] tokens) {
@@ -252,9 +252,6 @@ public class Grid extends GridBase {
         row = cellIndices[1];
         result = String.valueOf(getCellValue(row, col));
         return result;
-    }
-    public String toString() {
-        return "";
     }
     public double getCellValue(int row, int col) {
         return matrix[row][col].getValue();

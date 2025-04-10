@@ -16,6 +16,10 @@ public class TextCell extends Cell {
       // : Get the expression and remove the quotes
       // return getExpression();
       String expression = getExpression();
-      return expression.substring(1,expression.length()-1);
+      if (expression.length() > 1 && expression.charAt(0) == '"' 
+      && expression.charAt(expression.length()-1) == '"') {
+          return expression.substring(1, expression.length() - 1);
+      }
+      return expression;
     }
 }

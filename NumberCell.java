@@ -27,6 +27,6 @@ public class NumberCell extends Cell {
    */
   public double getValue() {
       // Leverage this method when fulfilling the command, "value [cell]"
-      return 0.0;
+      return Double.parseDouble(getExpression());
   }
 }
