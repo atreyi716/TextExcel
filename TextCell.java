@@ -17,8 +17,8 @@ public class TextCell extends Cell {
       // return getExpression();
       String expression = getExpression();
       if (expression.length() > 1 && expression.charAt(0) == '"' 
-      && expression.charAt(expression.length()-1) == '"') {
-          return expression.substring(1, expression.length() - 1);
+      && expression.charAt(expression.length() - 1) == '"') {
+        return expression.substring(1, expression.length() - 1);
       }
       return expression;
     }

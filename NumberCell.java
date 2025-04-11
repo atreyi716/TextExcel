@@ -12,21 +12,65 @@
  *    Example:  a1 = ( sum b1 - b5 )
  */
 
-
 public class NumberCell extends Cell {
   /*
    * This returns the string to be presented in the grid.
    */
   public String toString() {
-      // Leverage this method when fulfilling the command, "display [cell]"
-      return getValue() + "";
+    // Leverage this method when fulfilling the command, "display [cell]"
+    return getValue() + "";
   }
-
   /*
    * This will return the number for this cell.
    */
   public double getValue() {
-      // Leverage this method when fulfilling the command, "value [cell]"
-      return Double.parseDouble(getExpression());
+    // Leverage this method when fulfilling the command, "value [cell]"
+    String[] tokens = GridBase.smartSplit(getExpression());
+    double value = 0;
+    String operator = "+";
+    // If parentheses, continue
+    // Check for a math operator
+    // Check if char is letter
+    // Check if char is a digit --> call performMathOperator
+    for (int i = 0; i < tokens.length; i++) {
+      if (tokens[i].equals("(")) {
+        continue;
+      }
+      // Different operations
+      if (tokens[i].equals("+")
+        || tokens[i].equals("-")
+        || tokens[i].equals("*")
+        || tokens[i].equals("/")) {
+        operator = tokens[i];
+      }
+      if (Character.isLetter(tokens[i].charAt(0))) {
+        String cellValue = GridBase.grid.processCommand("value " + tokens[i]);
+        double operand = Double.parseDouble(cellValue);
+        value = performMathOperation(operator, operand, value);
+      }
+      if (Character.isDigit(tokens[i].charAt(0))) {
+        double operand = Double.parseDouble(tokens[i]);
+        value = performMathOperation(operator, operand, value);
+      }
+    }
+    return value;
+  }
+
+  public double performMathOperation(String operator, double operand, double value) {
+    switch (operator) {
+      case "+":
+        value += operand;
+        break;
+      case "-":
+        value -= operand;
+        break;
+      case "*":
+        value *= operand;
+        break;
+      case "/":
+        value /= operand;
+        break;
+    }
+    return value;
   }
 }

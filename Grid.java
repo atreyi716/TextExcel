@@ -103,8 +103,7 @@ public class Grid extends GridBase {
             result = processValueCommand(tokens);
         } else if (tokens[0].equalsIgnoreCase("clear")) {
             createMatrix();
-        } else {
-            result = readCell(rowCount, colCount);
+            result = "Grids cleared.";
         } 
         return result;
     }
@@ -219,7 +218,8 @@ public class Grid extends GridBase {
     }
     private void updateNumberCellExpression(String[] tokens, int row, int col) {
         NumberCell number = new NumberCell();
-        number.setExpression(tokens[2]);
+        String expression = concatTokens(tokens, 2, tokens.length - 1);
+        number.setExpression(expression);
         matrix[row][col] = number;
     }
     private String processExprCommand(String[] tokens) {
@@ -313,6 +313,7 @@ public class Grid extends GridBase {
             for (int j = 0; j < colCount; j++) {
                 if (matrix[i][j] != null) {
                     String cellData = String.format("%" + cellWidth + "s", matrix[i][j].toString());
+                    
                     if (cellWidth < cellData.length()) {
                         result += cellData.substring(0, cellWidth);
                     }
