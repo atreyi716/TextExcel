@@ -43,11 +43,13 @@ public class NumberCell extends Cell {
         || tokens[i].equals("/")) {
         operator = tokens[i];
       }
+      // Cell case
       if (Character.isLetter(tokens[i].charAt(0))) {
         String cellValue = GridBase.grid.processCommand("value " + tokens[i]);
         double operand = Double.parseDouble(cellValue);
         value = performMathOperation(operator, operand, value);
       }
+      // Numbers
       if (Character.isDigit(tokens[i].charAt(0))) {
         double operand = Double.parseDouble(tokens[i]);
         value = performMathOperation(operator, operand, value);
@@ -55,7 +57,7 @@ public class NumberCell extends Cell {
     }
     return value;
   }
-
+  // Respective operations
   public double performMathOperation(String operator, double operand, double value) {
     switch (operator) {
       case "+":
