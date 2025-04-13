@@ -74,8 +74,6 @@ public class Main extends ExcelBase {
 
         return result;
     }
-
-    
     /*
      * Method loadFromFile.
      *

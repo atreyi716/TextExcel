@@ -34,6 +34,11 @@ public class Grid extends GridBase {
     public Grid() {
         createMatrix();
     }
+
+    public static String getCellValue(String location) {
+        return GridBase.grid.processCommand(location.substring(0, 2));
+    }
+
     public void createMatrix () {
         matrix = new Cell[rowCount][colCount];
         for (int i = 0; i < rowCount; i++)
@@ -93,7 +98,7 @@ public class Grid extends GridBase {
             result = printGrid();
         } else if (isGridSettingCommand(tokens[0])) {
             result = processGridSettingCommand(tokens);
-        } else if (isCellCommand(tokens[0])) {
+        } else if (isCellName(tokens[0])) {
             result = processCellCommand(tokens);
         } else if (isExprCommand(tokens[0])) {
             result = processExprCommand(tokens);
@@ -102,15 +107,13 @@ public class Grid extends GridBase {
         } else if (tokens[0].equalsIgnoreCase("value")) {
             result = processValueCommand(tokens);
         } else if (tokens[0].equalsIgnoreCase("clear")) {
-            createMatrix();
-            result = "Grids cleared.";
+            processClearCommand(tokens);
+            result = "Grid cleared.";
         } 
         return result;
     }
-    // Determine what a cell location's components are
 
-    // Check if a valid command is inputted
-    private boolean isGridSettingCommand(String input) {
+    private static boolean isGridSettingCommand(String input) {
         if (input.equalsIgnoreCase("rows") 
         || input.equalsIgnoreCase("cols") 
         || input.equalsIgnoreCase("width"))
@@ -168,13 +171,19 @@ public class Grid extends GridBase {
                 break;
         } 
     }
-    private boolean isCellCommand(String input) {
-        for (int i = 1; i < input.length(); i++) {
-            if (!Character.isDigit(input.charAt(i))) {
-                return false;
-            }
+    private void processClearCommand(String[] tokens) {
+        if (tokens.length == 2) {
+            int col = tokens[1].toLowerCase().charAt(0) - 'a';
+            int row = Integer.parseInt(tokens[1].substring(1)) - 1;
+            matrix[row][col] = new Cell();
+        } else if (tokens.length == 1) {
+            createMatrix();
         }
-        return true;
+    }
+    private static boolean isCellName(String input) {
+        boolean isCell = Character.isLetter(input.charAt(0)) &&
+                         Character.isDigit(input.charAt(1));
+        return isCell;
     }
     private String processCellCommand(String[] tokens) {
         String result = "";
@@ -189,7 +198,7 @@ public class Grid extends GridBase {
         }
         return result;
     } 
-    private int[] getCellIndices(String input) {
+    private static int[] getCellIndices(String input) {
         int[] indices = new int[2];
         int col = input.toLowerCase().charAt(0) - 'a';
         int row = Integer.parseInt(input.substring(1)) - 1;
@@ -206,6 +215,8 @@ public class Grid extends GridBase {
         }
         if (tokens[2].startsWith("\"")) {
             updateTextCellExpression(tokens, row, col);
+        } else if (isDateExpression(tokens[2])) {
+            updateDateCellExpression(tokens[2], row, col);
         } else {
             updateNumberCellExpression(tokens, row, col);
         }
@@ -222,6 +233,11 @@ public class Grid extends GridBase {
         number.setExpression(expression);
         matrix[row][col] = number;
     }
+    private void updateDateCellExpression(String dateExpr, int row, int col) {
+        DateCell date = new DateCell();
+        date.setExpression(dateExpr);
+        matrix[row][col] = date;
+    }
     private String processExprCommand(String[] tokens) {
         int row, col;
         int[] cellIndices = getCellIndices(tokens[1]);
@@ -229,7 +245,7 @@ public class Grid extends GridBase {
         row = cellIndices[1];
         return matrix[row][col].getExpression();
     }
-    private boolean isExprCommand(String input) {
+    private static boolean isExprCommand(String input) {
         if (input.equalsIgnoreCase("expr")) {
             return true;
         }
@@ -265,6 +281,47 @@ public class Grid extends GridBase {
             }
         }
         return result;
+    }
+    public void Sort(String beginCell, String endCell, boolean ascending) {
+	    int startCol = beginCell.charAt(0);
+	    int endCol = endCell.charAt(0);
+	    int startRow = Integer.parseInt(beginCell.substring(1)) - 1;
+	    int endRow = Integer.parseInt(endCell.substring(1)) - 1;
+	    List <Double> list = new ArrayList<>();
+        for (int i = startRow; i < endRow; i++) {
+	        for (int j = startCol; j < endCol; j++) {
+	        if (matrix[i][j].getExpression().contains("(")
+            || (matrix[i][j].getExpression().contains(")"))) {
+	            for (int k = 0; k < matrix[i][j].getExpression().length(); k++) {
+	                if (Character.isLetter(matrix[i][j].getExpression().charAt(k))) {
+	                    return;
+                    }
+                }
+            }
+            try {
+                double value = matrix[i][j].getValue();
+                list.add(value); 
+            } catch (Exception e) {
+	            list.add(0.0);
+            }
+            }
+        Collections.sort(list);
+        if (!ascending) {
+	        Collections.reverse(list);
+        }
+        }
+    }
+    private static boolean isDateExpression(String expr) {
+        int slashCount = 0;
+        for (int i = 0; i < expr.length(); i++) {
+            if (expr.charAt(i) == '/') {
+                slashCount++;
+            } 
+        }
+        if (slashCount == 2) {
+            return true;
+        }
+        return false;
     }
     // Create the GRID
     // Top border: has spaces and letters (use function for ASCII values)
