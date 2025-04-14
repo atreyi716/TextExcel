@@ -35,8 +35,10 @@ public class Grid extends GridBase {
         createMatrix();
     }
 
-    public static String getCellValue(String location) {
-        return GridBase.grid.processCommand(location.substring(0, 2));
+    public static String getCellValue(String cellName) {
+        // Run "value [Cell] command."
+        String command = "value " + cellName;
+        return GridBase.grid.processCommand(command);
     }
 
     public void createMatrix () {
@@ -180,10 +182,18 @@ public class Grid extends GridBase {
             createMatrix();
         }
     }
-    private static boolean isCellName(String input) {
+    public static boolean isCellName(String input) {
         boolean isCell = Character.isLetter(input.charAt(0)) &&
                          Character.isDigit(input.charAt(1));
         return isCell;
+    }
+    public static boolean isNumber(String input) {
+        for (int i = 0; i < input.length(); i++) {
+            if (Character.isLetter(input.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
     private String processCellCommand(String[] tokens) {
         String result = "";
@@ -323,85 +333,90 @@ public class Grid extends GridBase {
         }
         return false;
     }
-    // Create the GRID
-    // Top border: has spaces and letters (use function for ASCII values)
+    // Create the GRID    
+    // Combining the components together
+    // StringBuilder object for appending and adjusting
+    public String printGrid() {
+        StringBuilder result = new StringBuilder();
+    
+        result.append(printColumnHeaders());
+        result.append(printTopBorder());
+    
+        for (int i = 0; i < rowCount; i++) {
+            result.append(printRow(i));
+            result.append(printRowBorder());
+        }
+    
+        return result.toString();
+    }
+    // Split into columns
+    // Each columun has a letter, use ASCII code
     // Calculate the amount of total spaces
     // Calculate the amount of spaces to the left
     // If the width is odd, there should be one less left space
-    public String printGrid() {
-        String result = "";
-        result += "    |";
-        for (int j = 1; j <= colCount; j++) {
-            char letter = (char)('A' + j - 1);
-            int spaces = (cellWidth - 1);
-            int left_spaces = spaces / 2;
+    // Repeat function for set of actions (avoid for-loops)
+    private String printColumnHeaders() {
+        StringBuilder header = new StringBuilder("    |");
+    
+        for (int j = 0; j < colCount; j++) {
+            char letter = (char) ('A' + j);
+            int spaces = cellWidth - 1;
+            int leftSpaces = spaces / 2;
+    
             if (spaces % 2 != 0) {
-                left_spaces = (cellWidth) / 2;
+                leftSpaces = cellWidth / 2;
             }
-            
-            for (int k = 1; k <= left_spaces; k++) {
-                 result += " ";
-            }
-            result += String.format("%c", letter);
-            for (int k = 1; k <= cellWidth - left_spaces - 1; k++) {
-                result += " ";
-            }
-            result += "|";
+    
+            header.append(" ".repeat(leftSpaces));
+            header.append(letter);
+            header.append(" ".repeat(cellWidth - leftSpaces - 1));
+            header.append("|");
         }
-        result += "\n";
-
-        // Print the top border
-        // Borders always start with four dashes and a plus
-        // Print the amount of columns (plus)
-        // Print the dashes in between each dash
-        // Progress onto the next line
-        result += "----+";
-        for (int j = 1; j <= colCount; j++) {
-            for (int k = 1; k <= cellWidth; k++) {
-                result += "-";
-            }
-            result += "+";
-        }
-        result += "\n";
-        
-        // Print the sub-grid with row numbers
-        for (int i = 0; i < rowCount; i++) {
-            result += String.format("%3d |", i + 1);
-            for (int j = 0; j < colCount; j++) {
-                if (matrix[i][j] != null) {
-                    String cellData = String.format("%" + cellWidth + "s", matrix[i][j].toString());
-                    
-                    if (cellWidth < cellData.length()) {
-                        result += cellData.substring(0, cellWidth);
-                    }
-                    else {
-                        result += cellData;
-                    }
-                }
-                else {
-                    for (int k = 1; k <= cellWidth; k++) {
-                        result += " ";
-                    } 
-                }
-                
-                result += "|";
-            }
-            result += "\n";
-
-            // Print the border between sub-grid rows
-            result += "----+";
-            for (int j = 1; j <= colCount; j++) {
-                for (int k = 1; k <= cellWidth; k++) {
-                    result += "-";
-                }
-                result += "+";
-            }
-            result += "\n";
-        }
-        return result;
+    
+        header.append("\n");
+        return header.toString();
     }
-
-        
+    // Printing the border
+    // Beginning dashes
+    // Adding the respective amount of "+" and "-" in between
+    private String printTopBorder() {
+        StringBuilder border = new StringBuilder("----+");
+        for (int j = 0; j < colCount; j++) {
+            border.append("-".repeat(cellWidth)).append("+");
+        }
+        border.append("\n");
+        return border.toString();
+    }
+    // Printing rows
+    // Deal with spacing
+    private String printRow(int rowIndex) {
+        StringBuilder row = new StringBuilder();
+        row.append(String.format("%3d |", rowIndex + 1));
+    
+        for (int j = 0; j < colCount; j++) {
+            String content = "";
+    
+            if (matrix[rowIndex][j] != null) {
+                content = matrix[rowIndex][j].toString();
+                if (content.length() > cellWidth) {
+                    content = content.substring(0, cellWidth);
+                } else {
+                    content = String.format("%" + cellWidth + "s", content);
+                }
+            } else {
+                content = " ".repeat(cellWidth);
+            }
+    
+            row.append(content).append("|");
+        }
+    
+        row.append("\n");
+        return row.toString();
+    }
+    
+    private String printRowBorder() {
+        return printTopBorder(); // Reuse the same logic
+    }
     /**
      * saveToFile
      *

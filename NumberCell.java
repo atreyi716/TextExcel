@@ -26,7 +26,8 @@ public class NumberCell extends Cell {
     */
     public double getValue() {
         // Leverage this method when fulfilling the command, "value [cell]"
-        String[] tokens = GridBase.smartSplit(getExpression());
+        String cellExpression = getExpression();
+        String[] tokens = GridBase.smartSplit(cellExpression);
         double value = 0;
         String operator = "+";
         // If parentheses, continue
@@ -55,13 +56,13 @@ public class NumberCell extends Cell {
                 // Different operations
                 operator = tokens[i];
                 i++;
-            } else if (Character.isLetter(tokens[i].charAt(0))) {
+            } else if (Grid.isCellName(tokens[i])) {
                 // Cell case
                 String cellValue = GridBase.grid.processCommand("value " + tokens[i]);
                 double operand = Double.parseDouble(cellValue);
                 value = performMathOperation(operator, operand, value);
                 i++;
-            } else if (Character.isDigit(tokens[i].charAt(0))) {
+            } else if (Grid.isNumber(tokens[i])) {
                 // Numbers
                 double operand = Double.parseDouble(tokens[i]);
                 value = performMathOperation(operator, operand, value);

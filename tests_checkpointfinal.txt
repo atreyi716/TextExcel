@@ -1,4 +1,4 @@
-﻿// Initialize grid: clear and set size
+// Initialize grid: clear and set size
 clear
 0 0
 rows = 30
