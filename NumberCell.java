@@ -49,10 +49,19 @@ public class NumberCell extends Cell {
                 double[] result = sumAndAvg(tokens[i + 1], tokens[i + 3]);
                 value = result[1];
                 i += 4; // Move to the last token
+            } else if (tokens[i].equalsIgnoreCase("sqrt")) {
+                double operand = Double.parseDouble(tokens[i+1]);
+                value = Math.sqrt(operand);
+                i += 2;
+            } else if (tokens[i].equalsIgnoreCase("log")) {
+                double operand = Double.parseDouble(tokens[i+1]);
+                value = Math.log(operand);
+                i += 2;
             } else if ( tokens[i].equals("+") || 
                         tokens[i].equals("-") ||
                         tokens[i].equals("*") ||
-                        tokens[i].equals("/")) { 
+                        tokens[i].equals("/") ||
+                        tokens[i].equals("^")) { 
                 // Different operations
                 operator = tokens[i];
                 i++;
@@ -109,6 +118,9 @@ public class NumberCell extends Cell {
             break;
             case "/":
             value /= operand;
+            break;
+            case "^":
+            value = Math.pow(value, operand);
             break;
         }
         return value;

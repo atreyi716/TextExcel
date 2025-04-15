@@ -104,6 +104,12 @@ public class Grid extends GridBase {
             result = processCellCommand(tokens);
         } else if (isExprCommand(tokens[0])) {
             result = processExprCommand(tokens);
+        } else if (tokens[0].equalsIgnoreCase("sorta")) {
+            Sort(tokens[1], tokens[3], true);
+            result = "Sorted in ascending order.";
+        } else if (tokens[0].equalsIgnoreCase("sortd")) {
+            Sort(tokens[1], tokens[3], false);
+            result = "Sorted in ascending order.";
         } else if (tokens[0].equalsIgnoreCase("display")) {
             result = processDisplayCommand(tokens);
         } else if (tokens[0].equalsIgnoreCase("value")) {
@@ -293,34 +299,30 @@ public class Grid extends GridBase {
         return result;
     }
     public void Sort(String beginCell, String endCell, boolean ascending) {
-	    int startCol = beginCell.charAt(0);
-	    int endCol = endCell.charAt(0);
+	    int startCol = beginCell.charAt(0) - 'a';
+	    int endCol = endCell.charAt(0) - 'a';
 	    int startRow = Integer.parseInt(beginCell.substring(1)) - 1;
 	    int endRow = Integer.parseInt(endCell.substring(1)) - 1;
 	    List <Double> list = new ArrayList<>();
-        for (int i = startRow; i < endRow; i++) {
-	        for (int j = startCol; j < endCol; j++) {
-	        if (matrix[i][j].getExpression().contains("(")
-            || (matrix[i][j].getExpression().contains(")"))) {
-	            for (int k = 0; k < matrix[i][j].getExpression().length(); k++) {
-	                if (Character.isLetter(matrix[i][j].getExpression().charAt(k))) {
-	                    return;
-                    }
-                }
-            }
-            try {
+        for (int i = startRow; i <= endRow; i++) {
+	        for (int j = startCol; j <= endCol; j++) {
                 double value = matrix[i][j].getValue();
                 list.add(value); 
-            } catch (Exception e) {
-	            list.add(0.0);
             }
-            }
+        }
         Collections.sort(list);
         if (!ascending) {
 	        Collections.reverse(list);
         }
+        int index = 0;
+        for (int i = startRow; i <= endRow; i++) {
+	        for (int j = startCol; j <= endCol; j++) {
+                String value = String.valueOf(list.get(index++));
+                matrix[i][j].setExpression(value);
+            }
         }
     }
+
     private static boolean isDateExpression(String expr) {
         int slashCount = 0;
         for (int i = 0; i < expr.length(); i++) {
